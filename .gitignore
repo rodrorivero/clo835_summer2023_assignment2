@@ -4,3 +4,4 @@ assignment1-dev.*
 **.terraform/*
 .terraform/*
 *.terraform.*
+assignment1-dev
