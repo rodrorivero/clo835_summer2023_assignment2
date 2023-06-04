@@ -36,4 +36,4 @@ jobs:
           docker build -t $DB_NAME -f Dockerfile_mysql .
           docker tag $APP_NAME:latest $ECR_REGISTRY:$GITHUB_SHA
           docker tag $DB_NAME:latest $ECR_REGISTRY:$GITHUB_SHA
-          docker push $ECR_REGISTRY:$GITHUB_SHA
+          docker push $ECR_REGISTRY:latest
