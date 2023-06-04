@@ -32,7 +32,7 @@ jobs:
           aws ecr get-login-password
           docker build -t $APP_NAME -f Dockerfile .
           docker build -t $DB_NAME -f Dockerfile_mysql .
-          docker tag $APP_NAME:latest $ECR_REGISTRY_APP:$GITHUB_SHA
-          docker tag $DB_NAME:latest $ECR_REGISTRY_DB:$GITHUB_SHA
+          docker tag $APP_NAME:latest $ECR_REGISTRY_APP:latest
+          docker tag $DB_NAME:latest $ECR_REGISTRY_DB:latest
           docker push $ECR_REGISTRY_APP:latest
           docker push $ECR_REGISTRY_DB:latest
