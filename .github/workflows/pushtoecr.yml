@@ -31,7 +31,7 @@ jobs:
           echo $ECR_REGISTRY
           echo $APP_NAME
           echo $DB_NAME
-          aws ecr get-login --no-include-email
+          aws ecr get-login-password
           docker build -t $APP_NAME -f Dockerfile .
           docker build -t $DB_NAME -f Dockerfile_mysql .
           docker tag $APP_NAME:latest $ECR_REGISTRY:$GITHUB_SHA
