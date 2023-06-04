@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  ECR_REGISTRY_APP: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app
-  ECR_REGISTRY_DB: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db
+  ECR_REGISTRY_APP: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+  ECR_REGISTRY_DB: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
   APP_NAME: my-app
   DB_NAME: my-db
 
@@ -32,7 +32,7 @@ jobs:
           aws ecr get-login-password
           docker build -t $APP_NAME -f Dockerfile .
           docker build -t $DB_NAME -f Dockerfile_mysql .
-          docker tag $APP_NAME:latest $ECR_REGISTRY_APP:latest
-          docker tag $DB_NAME:latest $ECR_REGISTRY_DB:latest
-          docker push $ECR_REGISTRY_APP:latest
-          docker push $ECR_REGISTRY_DB:latest
+          docker tag $APP_NAME:latest $ECR_REGISTRY_APP
+          docker tag $DB_NAME:latest $ECR_REGISTRY_DB
+          docker push $ECR_REGISTRY_APP
+          docker push $ECR_REGISTRY_DB
