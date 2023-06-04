@@ -29,7 +29,8 @@ jobs:
       - name: Build and push Docker image
         run: |
           echo $ECR_REGISTRY
-          echo $IMAGE_NAME
+          echo $APP_NAME
+          echo $DB_NAME
           $(aws ecr get-login --no-include-email --region ${{ secrets.AWS_REGION }})
           docker build -t $APP_NAME -f Dockerfile .
           docker build -t $DB_NAME -f Dockerfile_mysql .
