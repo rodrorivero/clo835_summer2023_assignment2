@@ -154,7 +154,7 @@ resource "aws_instance" "my_amazon" {
                    mkdir /root/.aws
                    echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJSNPGNWZT\naws_secret_access_key=Uy3orQtY6DOE6BYY7godCCyvbYyreNhdqEkwBsUM\naws_session_token=FwoGZXIvYXdzEOD//////////wEaDCweAnr31//fWGxg0SLRAaiEyknJ7DVjeESbzqET2/2YSV1OpUzgXA7RiGcY6zKkv7KvLEQUwFRhOUuQeUXKq8ENuFCrjKVUuIwT54i1Lrzleut784u0DUInwlYLQUIneZKZ/k8SLEEZekh3trc1CoygcIdU5PmNC/vi0aP93uSaET/tlW7QbByPgNimOQ3eDK6astb3GBvaAiwj57LTYSgjljCpFB1b9qxaFX6fETEdcIkGFu0eBUXcAi8Vr9PRJpNxhxNBfPXr8JGxPMbhwFzcjemOcpey1YpnBTqggV2fKOTG8qMGMi1wFQPXi1osLkZPGYHdURzMbGcVAGrKzX65Rt7OpArEOE532AZWP8kpWrdLGgU=' > /root/.aws/credentials
                    yum install -y docker
-                   export DBHOST=172.17.0.2
+                   export DBHOST=172.18.0.2
                    export DBPORT=3306
                    export DBUSER=root
                    export DATABASE=employees
@@ -164,10 +164,11 @@ resource "aws_instance" "my_amazon" {
                    chkconfig docker on
                    whoami
                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 456965715091.dkr.ecr.us-east-1.amazonaws.com
-                   docker run -d -e MYSQL_ROOT_PASSWORD=pw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
-                   docker run -d -p 8080:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="blue" --name instance1 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
-                   docker run -d -p 8081:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="pink" --name instance2 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
-                   docker run -d -p 8082:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="lime" --name instance3 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+                   docker network create --driver bridge assignmentnw
+                   docker run -d -e MYSQL_ROOT_PASSWORD=pw  --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
+                   docker run -d -p 8080:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="blue" --name instance1 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+                   docker run -d -p 8081:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="pink" --name instance2 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+                   docker run -d -p 8082:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="lime" --name instance3 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
                  EOF
 
 
