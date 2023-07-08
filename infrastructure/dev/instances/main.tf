@@ -85,24 +85,6 @@ resource "aws_security_group" "my_sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  ingress {
-    description      = "HTTP for APP2"
-    from_port        = 8081
-    to_port          = 8081
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-  
-  ingress {
-    description      = "HTTP for APP3"
-    from_port        = 8082
-    to_port          = 8082
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
   egress {
     from_port        = 0
     to_port          = 0
@@ -152,24 +134,27 @@ resource "aws_instance" "my_amazon" {
   user_data  =<<-EOF
                    #!/bin/bash
                    mkdir /root/.aws
-                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJSNPGNWZT\naws_secret_access_key=Uy3orQtY6DOE6BYY7godCCyvbYyreNhdqEkwBsUM\naws_session_token=FwoGZXIvYXdzEOD//////////wEaDCweAnr31//fWGxg0SLRAaiEyknJ7DVjeESbzqET2/2YSV1OpUzgXA7RiGcY6zKkv7KvLEQUwFRhOUuQeUXKq8ENuFCrjKVUuIwT54i1Lrzleut784u0DUInwlYLQUIneZKZ/k8SLEEZekh3trc1CoygcIdU5PmNC/vi0aP93uSaET/tlW7QbByPgNimOQ3eDK6astb3GBvaAiwj57LTYSgjljCpFB1b9qxaFX6fETEdcIkGFu0eBUXcAi8Vr9PRJpNxhxNBfPXr8JGxPMbhwFzcjemOcpey1YpnBTqggV2fKOTG8qMGMi1wFQPXi1osLkZPGYHdURzMbGcVAGrKzX65Rt7OpArEOE532AZWP8kpWrdLGgU=' > /root/.aws/credentials
-                   yum install -y docker
+                   echo -en 'kind: Cluster\napiVersion: kind.x-k8s.io/v1alpha4\nnodes:\n- role: control-plane\n  image: kindest/node:v1.19.11@sha256:07db187ae84b4b7de440a73886f008cf903fcf5764ba8106a9fd5243d6f32729\n  extraPortMappings:\n  - containerPort: 30000\n    hostPort: 30000\n  - containerPort: 30001\n    hostPort: 30001\n' > /home/ec2-user/kind.yml                 
+                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJQ3N2VUVF\naws_secret_access_key=qAx5o/zSMZUqkyhJjV0Bs5soZaM+Wr/wTkQ1TOIg\naws_session_token=FwoGZXIvYXdzEBYaDMV06OAKXLI63DQXPiLRAR50PIs3M5rMeHvnv48LC9BqB+OxdGsr6ycutAoaV89+hRK9zl8LaO4ir6FaFN7ZIQ5qLWAeosWhap8NBI9FDfnzyANlg/jjLMUQTFoBCPUzeCDSBE3kmn/FYoKsi4/6WfayDS/pSnpkiHB/Ayjlpsw3oyqXWpbbW31W3rEJSydIBWicOCca5+9EuamgOEn+7YTpco1G42RlMMiWUzj00EaJbYDBKb9rX44XTInIJ7Xyp2bE5Tph2aeIbsB7v/x7WuudiqzcbAm9ybFC9MXiRE8MKL2dp6UGMi0We/aF0kXI7CP6Vq177XXl4dd0cpZDlxTyI/I0zpXKuvZCmkNl17sNJWrvsHM=' > /root/.aws/credentials
+                   et -ex
+                   sudo yum update -y
+                   sudo yum install docker -y
+                   sudo systemctl start docker
+                   sudo usermod -a -G docker ec2-user
+                   curl -sLo kind https://kind.sigs.k8s.io/dl/v0.11.0/kind-linux-amd64
+                   sudo install -o root -g root -m 0755 kind /usr/local/bin/kind
+                   rm -f ./kind
+                   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+                   rm -f ./kubectl
+                   sudo su - ec2-user
+                   kind create cluster --config /home/ec2-user/kind.yml
                    export DBHOST=172.18.0.2
                    export DBPORT=3306
                    export DBUSER=root
                    export DATABASE=employees
                    export DBPWD=pw
-                   service docker start
-                   usermod -a -G docker ec2-user
-                   chkconfig docker on
-                   whoami
-                   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 456965715091.dkr.ecr.us-east-1.amazonaws.com
-                   docker network create --driver bridge assignmentnw
-                   docker run -d -e MYSQL_ROOT_PASSWORD=pw  --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
-                   docker run -d -p 8080:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="blue" --name instance1 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
-                   docker run -d -p 8081:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="pink" --name instance2 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
-                   docker run -d -p 8082:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD -e APP_COLOR="lime" --name instance3 --network assignmentnw 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
-                 EOF
+            EOF
 
 
   tags = merge(local.default_tags,
