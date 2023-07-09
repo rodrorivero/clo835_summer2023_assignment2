@@ -165,7 +165,8 @@ resource "aws_instance" "my_amazon" {
       user        = "ec2-user"
       private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
       host        = aws_instance.my_amazon.public_ip
-    } 
+    }
+  }
     provisioner "file" {
     source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/replicaset_db.yml"
     destination = "/home/ec2-user/replicaset_db.yml"  # Replace with the destination path on the EC2 instance
@@ -174,7 +175,8 @@ resource "aws_instance" "my_amazon" {
       user        = "ec2-user"
       private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
       host        = aws_instance.my_amazon.public_ip
-    }  
+    } 
+  }
     provisioner "file" {
     source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/replicaset_app.yml"
     destination = "/home/ec2-user/replicaset_app.yml"  # Replace with the destination path on the EC2 instance
@@ -184,6 +186,7 @@ resource "aws_instance" "my_amazon" {
       private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
       host        = aws_instance.my_amazon.public_ip
     }  
+  }
     provisioner "file" {
     source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/app-deployment.yml"
     destination = "/home/ec2-user/app-deployment.yml"  # Replace with the destination path on the EC2 instance
@@ -192,7 +195,8 @@ resource "aws_instance" "my_amazon" {
       user        = "ec2-user"
       private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
       host        = aws_instance.my_amazon.public_ip
-    }  
+    } 
+  }
     provisioner "file" {
     source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/db-deployment.yml"
     destination = "/home/ec2-user/db-deployment.yml"  # Replace with the destination path on the EC2 instance
