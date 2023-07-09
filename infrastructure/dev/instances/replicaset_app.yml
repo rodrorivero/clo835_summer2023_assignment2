@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: app-replicaset
+  labels:
+    app: employees
+    component: app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: employees
+      component: app
+  template:
+    metadata:
+      labels:
+        app: employees
+        component: app
+    spec:
+      containers:
+        - name: my-app
+          image: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+          imagePullPolicy: Always
+          env:
+            - name: DBHOST
+              value: "my-db.db-namespace.svc.cluster.local"
+            - name: DBPORT
+              value: "3306"
+            - name: DBUSER
+              value: "root"
+            - name: DATABASE
+              value: "employees"
+            - name: DBPWD
+              value: "pw"
+            - name: APP_COLOR
+              value: "blue"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace      
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+      imagePullSecrets:
+        - name: ecr-credentials

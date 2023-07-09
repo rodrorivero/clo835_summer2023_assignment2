@@ -1,7 +1,7 @@
 *.tfstate
 *.tfstate.*
-assignment1-dev.*
+assignment2-dev.*
 **.terraform/*
 .terraform/*
 *.terraform.*
-assignment1-dev
+assignment2-dev
