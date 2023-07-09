@@ -1,32 +1,29 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: ReplicaSet
 metadata:
-  name: db-deployment
+  name: app-replicaset
   labels:
-    app: mysql
-    component: database
+    app: employees
+    component: app
 spec:
+  replicas: 3
   selector:
     matchLabels:
-      app: mysql
-      component: database
-  replicas: 3
+      app: employees
+      component: app
   template:
     metadata:
       labels:
-        app: mysql
-        component: database
+        app: employees
+        component: app
     spec:
       containers:
-        - name: my-db
-          image: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
-          imagePullPolicy: Always 
-          ports:
-          - containerPort: 3306
-            protocol: TCP
-          env:    
+        - name: my-app
+          image: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+          imagePullPolicy: Always
+          env:
             - name: DBHOST
-              value: "my-db"
+              value: "my-db.db-namespace.svc.cluster.local"
             - name: DBPORT
               value: "3306"
             - name: DBUSER
@@ -37,11 +34,12 @@ spec:
               value: "pw"
             - name: APP_COLOR
               value: "blue"
-            - name: MYSQL_ROOT_PASSWORD
-              value: "pw"
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.namespace
+                  fieldPath: metadata.namespace      
+          ports:
+          - containerPort: 8080
+            protocol: TCP
       imagePullSecrets:
         - name: ecr-credentials
