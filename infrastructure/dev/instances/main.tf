@@ -68,9 +68,9 @@ resource "aws_security_group" "my_sg" {
   }
   
   ingress {
-    description      = "HTTP for APP1"
-    from_port        = 8080
-    to_port          = 8080
+    description      = "HTTP for APP"
+    from_port        = 30000
+    to_port          = 30000
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
@@ -126,6 +126,83 @@ resource "aws_instance" "my_amazon" {
   key_name                    = aws_key_pair.my_key.key_name
   vpc_security_group_ids             = [aws_security_group.my_sg.id]
   associate_public_ip_address = false
+  provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/my_app.yaml"
+    destination = "/home/ec2-user/my_app.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }
+    
+  }
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/my_db.yaml"
+    destination = "/home/ec2-user/my_db.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }
+  }
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/service_app.yml"
+    destination = "/home/ec2-user/service_app.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }
+  }
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/service_db.yml"
+    destination = "/home/ec2-user/service_db.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    } 
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/replicaset_db.yml"
+    destination = "/home/ec2-user/replicaset_db.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }  
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/replicaset_app.yml"
+    destination = "/home/ec2-user/replicaset_app.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }  
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/app-deployment.yml"
+    destination = "/home/ec2-user/app-deployment.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }  
+    provisioner "file" {
+    source      = "/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/db-deployment.yml"
+    destination = "/home/ec2-user/db-deployment.yml"  # Replace with the destination path on the EC2 instance
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("/home/ec2-user/environment/assignment2/clo835_summer2023_assignment2/infrastructure/dev/instances/assignment2-dev")  # Path to your private key file
+      host        = aws_instance.my_amazon.public_ip
+    }      
+    }
 
   lifecycle {
     create_before_destroy = true
@@ -133,9 +210,9 @@ resource "aws_instance" "my_amazon" {
   
   user_data  =<<-EOF
                    #!/bin/bash
-                   mkdir /root/.aws
+                   mkdir /home/ec2-user/.aws
                    echo -en 'kind: Cluster\napiVersion: kind.x-k8s.io/v1alpha4\nnodes:\n- role: control-plane\n  image: kindest/node:v1.19.11@sha256:07db187ae84b4b7de440a73886f008cf903fcf5764ba8106a9fd5243d6f32729\n  extraPortMappings:\n  - containerPort: 30000\n    hostPort: 30000\n  - containerPort: 30001\n    hostPort: 30001\n' > /home/ec2-user/kind.yml                 
-                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJQ3N2VUVF\naws_secret_access_key=qAx5o/zSMZUqkyhJjV0Bs5soZaM+Wr/wTkQ1TOIg\naws_session_token=FwoGZXIvYXdzEBYaDMV06OAKXLI63DQXPiLRAR50PIs3M5rMeHvnv48LC9BqB+OxdGsr6ycutAoaV89+hRK9zl8LaO4ir6FaFN7ZIQ5qLWAeosWhap8NBI9FDfnzyANlg/jjLMUQTFoBCPUzeCDSBE3kmn/FYoKsi4/6WfayDS/pSnpkiHB/Ayjlpsw3oyqXWpbbW31W3rEJSydIBWicOCca5+9EuamgOEn+7YTpco1G42RlMMiWUzj00EaJbYDBKb9rX44XTInIJ7Xyp2bE5Tph2aeIbsB7v/x7WuudiqzcbAm9ybFC9MXiRE8MKL2dp6UGMi0We/aF0kXI7CP6Vq177XXl4dd0cpZDlxTyI/I0zpXKuvZCmkNl17sNJWrvsHM=' > /home/ec2-user/.aws/credentials
+                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJR6JKKBHR\naws_secret_access_key=AkCSUbQPOS/K2ZhlZdb2HkaJtu7gf5NgCk6uBHZY\naws_session_token=FwoGZXIvYXdzECwaDFwea/DMzbgGomMAISLRAZxM+zNWWh6PjMdCnoSSADZOfMzOjMQI0bdRTmG7GAl/824wQX5AghmQsIfXJXDLC5NGy2Uc8PodAlYpS0vXTNVD21B2qRFQhQiQSFPiTCe0YOV+FQC9roTbSKXLrhUVtFdnOq0CbfWPhCIbBZ6diPmGPRgHoiaqN/KqlrufLbtNQHcRDe9o9XTYP1mC7JUXvXzUHoIuBkuu9rAKKDZTgqdasRgNk7gcVoYp30o1HmfTjhId23sUw7bDuhj2S9T3wFnprG8QvIYEUe2xXk5ks7EPKNb9q6UGMi11gQTptOSh+jLDSdn91jtTzzR8vBleJLrkY5I1YBgxcD2ho68t/h4gSN1ZPOk=' > /home/ec2-user/.aws/credentials
                    et -ex
                    sudo yum update -y
                    sudo yum install docker -y

@@ -5,6 +5,8 @@ metadata:
   labels:
     env: prod
 spec:
+  hostname: my-db
+  subdomain: db
   containers:
     - name: my-db
       image: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
@@ -12,5 +14,25 @@ spec:
       ports:
       - containerPort: 3306
         protocol: TCP
-
+      env:    
+        - name: DBHOST
+          value: "my-db"
+        - name: DBPORT
+          value: "3306"
+        - name: DBUSER
+          value: "root"
+        - name: DATABASE
+          value: "employees"
+        - name: DBPWD
+          value: "pw"
+        - name: APP_COLOR
+          value: "blue"
+        - name: MYSQL_ROOT_PASSWORD
+          value: "pw"
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  imagePullSecrets:
+    - name: ecr-credentials
         
