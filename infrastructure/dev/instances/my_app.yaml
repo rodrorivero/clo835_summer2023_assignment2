@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+labels:
+  env: prod
+spec:
+  containers:
+    - name: my-app
+      image: 456965715091.dkr.ecr.us-east-1.amazonaws.com/my-db:latest
+      imagePullPolicy: Always
+      env:
+        - name: DBHOST
+          value: my-bd.mysql-namespace.svc.cluster.local
+        - name: DBPORT
+          value: 3306
+        - name: DBUSER
+          value: root
+        - name: DATABASE
+          value: employees
+        - name: DBPWD
+          value: pw
+        - name: APP_COLOR
+          value: blue      
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+
+        
