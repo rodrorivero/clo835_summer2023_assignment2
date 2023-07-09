@@ -135,7 +135,7 @@ resource "aws_instance" "my_amazon" {
                    #!/bin/bash
                    mkdir /root/.aws
                    echo -en 'kind: Cluster\napiVersion: kind.x-k8s.io/v1alpha4\nnodes:\n- role: control-plane\n  image: kindest/node:v1.19.11@sha256:07db187ae84b4b7de440a73886f008cf903fcf5764ba8106a9fd5243d6f32729\n  extraPortMappings:\n  - containerPort: 30000\n    hostPort: 30000\n  - containerPort: 30001\n    hostPort: 30001\n' > /home/ec2-user/kind.yml                 
-                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJQ3N2VUVF\naws_secret_access_key=qAx5o/zSMZUqkyhJjV0Bs5soZaM+Wr/wTkQ1TOIg\naws_session_token=FwoGZXIvYXdzEBYaDMV06OAKXLI63DQXPiLRAR50PIs3M5rMeHvnv48LC9BqB+OxdGsr6ycutAoaV89+hRK9zl8LaO4ir6FaFN7ZIQ5qLWAeosWhap8NBI9FDfnzyANlg/jjLMUQTFoBCPUzeCDSBE3kmn/FYoKsi4/6WfayDS/pSnpkiHB/Ayjlpsw3oyqXWpbbW31W3rEJSydIBWicOCca5+9EuamgOEn+7YTpco1G42RlMMiWUzj00EaJbYDBKb9rX44XTInIJ7Xyp2bE5Tph2aeIbsB7v/x7WuudiqzcbAm9ybFC9MXiRE8MKL2dp6UGMi0We/aF0kXI7CP6Vq177XXl4dd0cpZDlxTyI/I0zpXKuvZCmkNl17sNJWrvsHM=' > /root/.aws/credentials
+                   echo -en '[default]\naws_access_key_id=ASIAWUZKHOSJQ3N2VUVF\naws_secret_access_key=qAx5o/zSMZUqkyhJjV0Bs5soZaM+Wr/wTkQ1TOIg\naws_session_token=FwoGZXIvYXdzEBYaDMV06OAKXLI63DQXPiLRAR50PIs3M5rMeHvnv48LC9BqB+OxdGsr6ycutAoaV89+hRK9zl8LaO4ir6FaFN7ZIQ5qLWAeosWhap8NBI9FDfnzyANlg/jjLMUQTFoBCPUzeCDSBE3kmn/FYoKsi4/6WfayDS/pSnpkiHB/Ayjlpsw3oyqXWpbbW31W3rEJSydIBWicOCca5+9EuamgOEn+7YTpco1G42RlMMiWUzj00EaJbYDBKb9rX44XTInIJ7Xyp2bE5Tph2aeIbsB7v/x7WuudiqzcbAm9ybFC9MXiRE8MKL2dp6UGMi0We/aF0kXI7CP6Vq177XXl4dd0cpZDlxTyI/I0zpXKuvZCmkNl17sNJWrvsHM=' > /home/ec2-user/.aws/credentials
                    et -ex
                    sudo yum update -y
                    sudo yum install docker -y
@@ -149,11 +149,9 @@ resource "aws_instance" "my_amazon" {
                    rm -f ./kubectl
                    sudo su - ec2-user
                    kind create cluster --config /home/ec2-user/kind.yml
-                   export DBHOST=172.18.0.2
-                   export DBPORT=3306
-                   export DBUSER=root
-                   export DATABASE=employees
-                   export DBPWD=pw
+                   sudo su - ec2-user
+                   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 456965715091.dkr.ecr.us-east-1.amazonaws.com
+                   kubectl create secret generic ecr-credentials --from-file=.dockerconfigjson=$HOME/.docker/config.json --type=kubernetes.io/dockerconfigjson
             EOF
 
 
